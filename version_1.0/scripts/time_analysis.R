@@ -1,4 +1,6 @@
 time_analysis = function(request_data, maintopic, start_date, end_date){
+
+  library(lubridate)
   
   if (maintopic == 'all'){
     d = request_data %>% filter(Request.Date>start_date & Request.Date<end_date & !is.na(Days.to.Respond))
