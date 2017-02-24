@@ -1,17 +1,26 @@
-dept_analysis = function(start_date, end_date){
+dept_analysis = function(request_data, maintopic, start_date, end_date){
   
   library(ggplot2)
   library(reshape2)
   
-  d = sm1 %>%
-    filter(Request.Date>start_date & Request.Date<end_date) %>%
-    select(Assigned.Department,Days.to.Respond) %>%
+  if (maintopic == 'all'){
+    d = request_data %>% filter(Request.Date>start_date & Request.Date<end_date & !is.na(Days.to.Respond))
+  } else {
+    d = request_data %>% filter(TopicBig %in% maintopic & Request.Date>start_date & Request.Date<end_date & !is.na(Days.to.Respond))
+  }
+
+  d = d %>%
+    dplyr::select(Assigned.Department,Days.to.Respond) %>%
     group_by(Assigned.Department) %>%
-    summarise("Number of Records" = n(), "Average Respond Time (0.5 hours)" = 48*sum(Days.to.Respond)/n())
+    summarise("Number of Records" = n(), "Average Respond Time (hour)" = 24*sum(Days.to.Respond)/n())
   
   dm = melt(d,id='Assigned.Department')
+  x_order = order(dm[dm$variable=='Number of Records',3],decreasing = T)
+  dm2 = dm[c(x_order,length(x_order)+x_order),]
+  dm2$Assigned.Department = as.character(dm2$Assigned.Department)
+  dm2$Assigned.Department = factor(dm2$Assigned.Department, levels=unique(dm2$Assigned.Department))
   
-  ggplot(dm, aes(x=reorder(Assigned.Department,-value), y=value, color=variable, group=variable)) + 
+  ggplot(dm2, aes(x=Assigned.Department, y=value, color=variable, group=variable)) + 
     geom_line(stat='identity',size=1)+
     labs(title='Assigned Department Analysis',x=NULL,y=NULL,fill='') +
     theme_bw() + 
