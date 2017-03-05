@@ -1,6 +1,7 @@
 library(leaflet)
 library(leaflet.extras)
 source("./scripts/all_data_func.R")
+
 ## set drop-down menu options
 maintopics = c("all", as.character(unique(sm_full$TopicBig)))
 topics = c("all", as.character(unique(sm_full$Topic)))
