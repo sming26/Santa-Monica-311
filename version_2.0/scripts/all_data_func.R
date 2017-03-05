@@ -1,5 +1,7 @@
 ## load datasets
 library(curl)
+library(dplyr)
+library(lubridate)
 load('./dataset/topic.RData')
 endpoint <- "https://data.smgov.net/resource/tsas-mvez.csv?$limit=50000&$offset="
 url <- NULL

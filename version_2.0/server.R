@@ -6,7 +6,7 @@ library(dplyr)
 source("./scripts/all_data_func.R")
 
 maintopics = as.character(unique(sm_full$TopicBig))
-topics = c('all',as.character(unique(sm_full$Topic)))
+topics = as.character(unique(sm_full$Topic))
 
 subtopic_lst = list()
 for (i in seq(44)) {
@@ -83,7 +83,11 @@ server <- function(input, output, session) {
     #   leafletProxy('heatmap') %>% clearGroup('heat')
     #   # more plots
     if (input$maintopic == 'all') {
-      updateSelectInput(session, 'subtopic', choices = topics, selecte = 'all')
+      # sub topic menu update
+      updateSelectInput(session, 'subtopic', choices = c('all',topics), selected = 'all')
+      # print(1)
+      # print(input$maintopic)
+      # print(input$subtopic)
       if (input$subtopic == 'all' & input$dept == 'all') {
         circle_data = sm1 %>% filter(Request.Date>input$dates[1] & Request.Date<input$dates[2])
         heat_data = sm1 %>% filter(Request.Date>input$dates[1] & Request.Date<input$dates[2])
@@ -93,17 +97,29 @@ server <- function(input, output, session) {
       } else if (input$dept == 'all') {
         circle_data = sm1 %>% filter(Topic %in% input$subtopic & Request.Date>input$dates[1] & Request.Date<input$dates[2])
         heat_data = sm1 %>% filter(Topic %in% input$subtopic & Request.Date>input$dates[1] & Request.Date<input$dates[2])
+        # main topic menu update
         main = sm1 %>% filter(Topic %in% input$subtopic)
         updateSelectInput(session, 'maintopic', selected = main[1,'TopicBig'])
+        # print(2)
+        # print(input$maintopic)
+        # print(input$subtopic)
       } else {
         circle_data = sm1 %>% filter(Topic %in% input$subtopic & Assigned.Department %in% input$dept & Request.Date>input$dates[1] & Request.Date<input$dates[2])
         heat_data = sm1 %>% filter(Topic %in% input$subtopic & Assigned.Department %in% input$dept & Request.Date>input$dates[1] & Request.Date<input$dates[2])
+        # main topic menu update
         main = sm1 %>% filter(Topic %in% input$subtopic)
         updateSelectInput(session, 'maintopic', selected = main[1,'TopicBig'])
       }
     } else {
+      # print(3)
+      # print(input$maintopic)
+      # print(input$subtopic)
+      # subtopic menu update for chaning main topic
       if (!input$subtopic %in% subtopic_lst[[which(maintopics==input$maintopic)]]) {
         updateSelectInput(session, 'subtopic', choices = c('all',subtopic_lst[[which(maintopics==input$maintopic)]]), selected = 'all')
+        # print(4)
+        # print(input$maintopic)
+        # print(input$subtopic)
       }
       if (input$subtopic == 'all' & input$dept == 'all') {
         circle_data = sm1 %>% filter(TopicBig %in% input$maintopic & Request.Date>input$dates[1] & Request.Date<input$dates[2])
