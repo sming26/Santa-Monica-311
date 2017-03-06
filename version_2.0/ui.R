@@ -14,36 +14,34 @@ header = dashboardHeader(title="Santa Monica 311")
 
 ### sidebar
 sidebar = dashboardSidebar(
+  tags$style(type='text/css', "button#reset { margin-left: 10.5px; }"),
   selectInput("maintopic", "Topic groups", maintopics, multiple = F, selectize = T),
   selectInput("subtopic", "Topics", topics, multiple = F, selectize = T),
   selectInput("dept", "Assigned departments", depts, multiple = F, selectize = T),
   dateRangeInput('dates',label = 'Date range',start = Sys.Date() - 365, end = Sys.Date()),
-  actionButton("reset", label = "Reset"),
-  tags$style(type='text/css', "button#reset { margin-left: 10.5px; }")
+  actionButton("reset", label = "Reset")
 )
 
-### 
+### Body
 body = dashboardBody(
-  mainPanel(id="plots",
-            tags$style(type='text/css', "#plots {width:960px;height:680px}"),
-            
-            fluidRow(
-              valueBoxOutput("numberOfRequest"),
-              valueBoxOutput("respondTime"),
-              valueBoxOutput("increase")
-            ),
-            fluidRow(
-              column(width=6,
-                     box(width = NULL,
-                         leafletOutput("heatmap", height = 300)),
-                     box(width = NULL,
-                            leafletOutput("circlemap", height = 300))), 
-              column(width = 6,
-                     box(width = NULL,
-                         plotOutput("dept_analysis",height = 300)),
-                     box(width = NULL,
-                         plotOutput("time_analysis", height = 300)))
-            )
+  tags$head(tags$style(HTML(".small-box {height: 160px}"))),
+  tags$style(type='text/css', '#ten {background-color: rgba(255,255,0,0.40); color: green;}'), 
+  fluidRow(
+    column(width=3,
+           valueBoxOutput("numberOfRequest", width=NULL)),
+    column(width=3,
+           valueBoxOutput("respondTime", width=NULL)),
+    column(width=6,
+           verbatimTextOutput("countTop5"),
+           verbatimTextOutput("timeBottom5"))
+  ),
+  fluidRow(
+    column(width=6,
+           box(width=NULL, leafletOutput("heatmap", height=240)),
+           box(width=NULL, leafletOutput("circlemap", height=240))), 
+    column(width = 6,
+           box(width=NULL, plotlyOutput("dept_analysis", height=240)),
+           box(width=NULL, plotlyOutput("time_analysis", height=240)))
   )
 )
 

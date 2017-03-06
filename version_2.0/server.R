@@ -2,8 +2,10 @@
 # devtools::install_github('bhaskarvk/leaflet.extras')
 library(sp)
 library(shiny)
+library(plotly)
 library(dplyr)
-source("./scripts/all_data_func.R")
+library(reshape2)
+library(lubridate)
 
 maintopics = as.character(unique(sm_full$TopicBig))
 topics = as.character(unique(sm_full$Topic))
@@ -157,20 +159,49 @@ server <- function(input, output, session) {
       addWebGLHeatmap(lng=~Longitude,lat=~Latitude,size=20,units='px',intensity=0.05,alphaRange=0.2,group='heat')
 
     ## auxiliary plots
-    output$dept_analysis <- renderPlot({
+    output$dept_analysis <- renderPlotly({
       # If no requests are in view, don't plot
       # if (nrow(requestsInBounds()) == 0)
       #   return(NULL)
       dept_analysis(input$maintopic,input$dates[1],input$dates[2])
     })
 
-    output$time_analysis <- renderPlot({
+    output$time_analysis <- renderPlotly({
       # If no requests are in view, don't plot
       # if (nrow(requestsInBounds()) == 0)
       #   return(NULL)
       time_analysis(input$maintopic,input$subtopic,input$dept,input$dates[1],input$dates[2])
     })
 
+    ##########-----------------add 3 final results to "paste0"-----------------------------#
+    output$numberOfRequest <- renderValueBox({
+      valueBox(
+        summaries(input$maintopic,input$subtopic,input$dept,input$dates[1],input$dates[2])[[1]], 
+        "Total Number of Requests", icon = icon("list"),
+        color = "light-blue"
+      )
+    })
+    
+    output$respondTime <- renderValueBox({
+      valueBox(
+        summaries(input$maintopic,input$subtopic,input$dept,input$dates[1],input$dates[2])[[2]],
+        "Average Response Days", icon = icon("calendar-o"),
+        color = "light-blue"
+      )
+    })
+    
+    output$countTop5 <- renderText({
+      paste('Most Frequest Request Topics Top 5:',
+            paste(summaries(input$maintopic,input$subtopic,input$dept,input$dates[1],input$dates[2])[[3]],collapse = ', '), 
+            sep='\n')
+    })
+    
+    output$timeBottom5 <- renderText({
+      paste('Slowest Request Topics Top 5:',
+            paste(summaries(input$maintopic,input$subtopic,input$dept,input$dates[1],input$dates[2])[[4]],collapse = ', '), 
+            sep='\n')
+    })
+    
   })
 
   #### Show a pop-up for selected request
@@ -200,24 +231,5 @@ server <- function(input, output, session) {
     # })
   })
     
-    ##########-----------------add 3 final results to "paste0"-----------------------------#
-  output$numberOfRequest <- renderValueBox({
-    valueBox(
-      paste0(""), "Number of Requests", icon = icon("list"),
-      color = "light-blue"
-    )
-  })
-  output$respondTime <- renderValueBox({
-    valueBox(
-      paste0("D"), "Response Time", icon = icon("calendar-o"),
-      color = "light-blue"
-    )
-  })
-  output$increase <- renderValueBox({
-    valueBox(
-      paste0( "%"), "Efficient", icon = icon("level-up"),
-      color = "light-blue"
-    )
-  })
 }
 

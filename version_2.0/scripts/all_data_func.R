@@ -46,3 +46,4 @@ sm_full$Topic = as.factor(sm_full$Topic)
 ## load functions
 source("./scripts/dept_analysis.R")
 source("./scripts/time_analysis.R")
+source("./scripts/summaries.R")
