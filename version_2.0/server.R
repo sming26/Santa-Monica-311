@@ -2,7 +2,6 @@
 # devtools::install_github('bhaskarvk/leaflet.extras')
 library(sp)
 library(shiny)
-library(plotly)
 library(dplyr)
 library(reshape2)
 library(lubridate)
