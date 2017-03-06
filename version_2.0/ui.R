@@ -1,6 +1,7 @@
 library(leaflet)
 library(leaflet.extras)
 library(shinydashboard)
+library(plotly)
 source("./scripts/all_data_func.R")
 
 ## set drop-down menu options
