@@ -199,5 +199,25 @@ server <- function(input, output, session) {
     showRequestPopup(event$id, event$lat, event$lng)
     # })
   })
+    
+    ##########-----------------add 3 final results to "paste0"-----------------------------#
+  output$numberOfRequest <- renderValueBox({
+    valueBox(
+      paste0(""), "Number of Requests", icon = icon("list"),
+      color = "light-blue"
+    )
+  })
+  output$respondTime <- renderValueBox({
+    valueBox(
+      paste0("D"), "Response Time", icon = icon("calendar-o"),
+      color = "light-blue"
+    )
+  })
+  output$increase <- renderValueBox({
+    valueBox(
+      paste0( "%"), "Efficient", icon = icon("level-up"),
+      color = "light-blue"
+    )
+  })
 }
 
