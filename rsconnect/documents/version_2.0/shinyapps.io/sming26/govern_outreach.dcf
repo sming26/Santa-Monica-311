@@ -1,0 +1,11 @@
+name: govern_outreach
+title: govern_outreach
+account: sming26
+server: shinyapps.io
+appId: 161681
+bundleId: 736444
+url: https://sming26.shinyapps.io/govern_outreach/
+when: 1488860313.53705
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: dataset/sm.csv|dataset/sm2.csv|dataset/topic.csv
