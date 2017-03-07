@@ -1,5 +1,5 @@
-# devtools::install_github('rstudio/leaflet')
-# devtools::install_github('bhaskarvk/leaflet.extras')
+# devtools::instAll_github('rstudio/leaflet')
+# devtools::instAll_github('bhaskarvk/leaflet.extras')
 library(sp)
 library(shiny)
 library(dplyr)
@@ -63,13 +63,13 @@ server <- function(input, output, session) {
              Longitude >= lngRng[1] & Longitude <= lngRng[2])
   })
   
-  #### reset all the circles and auxiliary plots
+  #### reset All the circles and auxiliary plots
   observeEvent(input$reset, {
     # leafletProxy('circlemap') %>% clearGroup('circles')
     # leafletProxy('heatmap') %>% clearGroup('heat')
-    updateSelectInput(session, 'maintopic', selected = 'all')
-    updateSelectInput(session, 'subtopic', selected = 'all')
-    updateSelectInput(session, 'dept', selected = 'all')
+    updateSelectInput(session, 'maintopic', selected = 'All')
+    updateSelectInput(session, 'subtopic', selected = 'All')
+    updateSelectInput(session, 'dept', selected = 'All')
     updateDateRangeInput(session, 'dateRange', start = Sys.Date()-365, end = Sys.Date())
     # output$dept_analysis = renderPlot({})
     # output$time_analysis = renderPlot({})
@@ -83,21 +83,24 @@ server <- function(input, output, session) {
     #   leafletProxy('circlemap') %>% clearGroup('circles')
     #   leafletProxy('heatmap') %>% clearGroup('heat')
     #   # more plots
-    if (input$maintopic == 'all') {
+    if (input$maintopic == 'All') {
       # sub topic menu update
-      updateSelectInput(session, 'subtopic', choices = c('all',topics), selected = 'all')
+      updateSelectInput(session, 'subtopic', choices = c('All',topics), selected = 'All')
       # print(1)
       # print(input$maintopic)
       # print(input$subtopic)
-      if (input$subtopic == 'all' & input$dept == 'all') {
+      if (input$subtopic == 'All' & input$dept == 'All') {
         circle_data = sm1 %>% filter(Request.Date>input$dates[1] & Request.Date<input$dates[2])
         heat_data = sm1 %>% filter(Request.Date>input$dates[1] & Request.Date<input$dates[2])
-      } else if (input$subtopic == 'all') {
+        full_data = sm_full %>% filter(Request.Date>input$dates[1] & Request.Date<input$dates[2])
+      } else if (input$subtopic == 'All') {
         circle_data = sm1 %>% filter(Assigned.Department %in% input$dept & Request.Date>input$dates[1] & Request.Date<input$dates[2])
         heat_data = sm1 %>% filter(Assigned.Department %in% input$dept & Request.Date>input$dates[1] & Request.Date<input$dates[2])
-      } else if (input$dept == 'all') {
+        full_data = sm_full %>% filter(Assigned.Department %in% input$dept & Request.Date>input$dates[1] & Request.Date<input$dates[2])
+      } else if (input$dept == 'All') {
         circle_data = sm1 %>% filter(Topic %in% input$subtopic & Request.Date>input$dates[1] & Request.Date<input$dates[2])
         heat_data = sm1 %>% filter(Topic %in% input$subtopic & Request.Date>input$dates[1] & Request.Date<input$dates[2])
+        full_data = sm_full %>% filter(Topic %in% input$subtopic & Request.Date>input$dates[1] & Request.Date<input$dates[2])
         # main topic menu update
         main = sm1 %>% filter(Topic %in% input$subtopic)
         updateSelectInput(session, 'maintopic', selected = main[1,'TopicBig'])
@@ -107,6 +110,7 @@ server <- function(input, output, session) {
       } else {
         circle_data = sm1 %>% filter(Topic %in% input$subtopic & Assigned.Department %in% input$dept & Request.Date>input$dates[1] & Request.Date<input$dates[2])
         heat_data = sm1 %>% filter(Topic %in% input$subtopic & Assigned.Department %in% input$dept & Request.Date>input$dates[1] & Request.Date<input$dates[2])
+        full_data = sm_full %>% filter(Topic %in% input$subtopic & Assigned.Department %in% input$dept & Request.Date>input$dates[1] & Request.Date<input$dates[2])
         # main topic menu update
         main = sm1 %>% filter(Topic %in% input$subtopic)
         updateSelectInput(session, 'maintopic', selected = main[1,'TopicBig'])
@@ -117,23 +121,27 @@ server <- function(input, output, session) {
       # print(input$subtopic)
       # subtopic menu update for chaning main topic
       if (!input$subtopic %in% subtopic_lst[[which(maintopics==input$maintopic)]]) {
-        updateSelectInput(session, 'subtopic', choices = c('all',subtopic_lst[[which(maintopics==input$maintopic)]]), selected = 'all')
+        updateSelectInput(session, 'subtopic', choices = c('All',subtopic_lst[[which(maintopics==input$maintopic)]]), selected = 'All')
         # print(4)
         # print(input$maintopic)
         # print(input$subtopic)
       }
-      if (input$subtopic == 'all' & input$dept == 'all') {
+      if (input$subtopic == 'All' & input$dept == 'All') {
         circle_data = sm1 %>% filter(TopicBig %in% input$maintopic & Request.Date>input$dates[1] & Request.Date<input$dates[2])
         heat_data = sm1 %>% filter(TopicBig %in% input$maintopic & Request.Date>input$dates[1] & Request.Date<input$dates[2])
-      } else if (input$subtopic == 'all') {
+        full_data = sm_full %>% filter(TopicBig %in% input$maintopic & Request.Date>input$dates[1] & Request.Date<input$dates[2])
+      } else if (input$subtopic == 'All') {
         circle_data = sm1 %>% filter(TopicBig %in% input$maintopic & Assigned.Department %in% input$dept & Request.Date>input$dates[1] & Request.Date<input$dates[2])
         heat_data = sm1 %>% filter(TopicBig %in% input$maintopic & Assigned.Department %in% input$dept & Request.Date>input$dates[1] & Request.Date<input$dates[2])
-      } else if (input$dept == 'all') {
+        full_data = sm_full %>% filter(TopicBig %in% input$maintopic & Assigned.Department %in% input$dept & Request.Date>input$dates[1] & Request.Date<input$dates[2])
+      } else if (input$dept == 'All') {
         circle_data = sm1 %>% filter(TopicBig %in% input$maintopic & Topic %in% input$subtopic & Request.Date>input$dates[1] & Request.Date<input$dates[2])
         heat_data = sm1 %>% filter(TopicBig %in% input$maintopic & Topic %in% input$subtopic & Request.Date>input$dates[1] & Request.Date<input$dates[2])
+        full_data = sm_full %>% filter(TopicBig %in% input$maintopic & Topic %in% input$subtopic & Request.Date>input$dates[1] & Request.Date<input$dates[2])
       } else {
         circle_data = sm1 %>% filter(TopicBig %in% input$maintopic & Topic %in% input$subtopic & Assigned.Department %in% input$dept & Request.Date>input$dates[1] & Request.Date<input$dates[2])
         heat_data = sm1 %>% filter(TopicBig %in% input$maintopic & Topic %in% input$subtopic & Assigned.Department %in% input$dept & Request.Date>input$dates[1] & Request.Date<input$dates[2])
+        full_data = sm_full %>% filter(TopicBig %in% input$maintopic & Topic %in% input$subtopic & Assigned.Department %in% input$dept & Request.Date>input$dates[1] & Request.Date<input$dates[2])
       }
     }
 
@@ -145,7 +153,7 @@ server <- function(input, output, session) {
       ## radius are set by response time for the data point divided by max rsponse time multiply 100
       # max_size <- max(circle_data$Days.to.Respond)
 
-      ## set layerId as request ID to ensure all circles shown on the map
+      ## set layerId as request ID to ensure All circles shown on the map
     leafletProxy("circlemap", data = circle_data) %>%
       clearGroup('circles') %>%
       addCircles(~Longitude, ~Latitude, radius=20, layerId=~Request.ID,
@@ -169,13 +177,13 @@ server <- function(input, output, session) {
       # If no requests are in view, don't plot
       # if (nrow(requestsInBounds()) == 0)
       #   return(NULL)
-      time_analysis(input$maintopic,input$subtopic,input$dept,input$dates[1],input$dates[2])
+      time_analysis(full_data)
     })
 
     ##########-----------------add 3 final results to "paste0"-----------------------------#
     output$numberOfRequest <- renderValueBox({
       valueBox(
-        summaries(input$maintopic,input$subtopic,input$dept,input$dates[1],input$dates[2])[[1]], 
+        summaries(full_data, input$dates[1], input$dates[2], input$dept)[[1]], 
         "Total Number of Requests", icon = icon("list"),
         color = "light-blue"
       )
@@ -183,7 +191,7 @@ server <- function(input, output, session) {
     
     output$respondTime <- renderValueBox({
       valueBox(
-        summaries(input$maintopic,input$subtopic,input$dept,input$dates[1],input$dates[2])[[2]],
+        summaries(full_data, input$dates[1], input$dates[2], input$dept)[[2]],
         "Average Response Days", icon = icon("calendar-o"),
         color = "light-blue"
       )
@@ -191,13 +199,13 @@ server <- function(input, output, session) {
     
     output$countTop5 <- renderText({
       paste('Most Frequest Request Topics Top 5:',
-            paste(summaries(input$maintopic,input$subtopic,input$dept,input$dates[1],input$dates[2])[[3]],collapse = ', '), 
+            paste(summaries(full_data, input$dates[1], input$dates[2], input$dept)[[3]],collapse = ', '), 
             sep='\n')
     })
     
     output$timeBottom5 <- renderText({
       paste('Slowest Request Topics Top 5:',
-            paste(summaries(input$maintopic,input$subtopic,input$dept,input$dates[1],input$dates[2])[[4]],collapse = ', '), 
+            paste(summaries(full_data, input$dates[1], input$dates[2], input$dept)[[4]],collapse = ', '), 
             sep='\n')
     })
     

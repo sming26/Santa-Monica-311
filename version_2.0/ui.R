@@ -2,16 +2,16 @@ library(leaflet)
 library(leaflet.extras)
 library(shinydashboard)
 library(plotly)
-source("./scripts/all_data_func.R")
+source("./scripts/All_data_func.R")
 
 ## set drop-down menu options
-maintopics = c("all", as.character(unique(sm_full$TopicBig)))
-topics = c("all", as.character(unique(sm_full$Topic)))
-depts = c("all", as.character(unique(sm_full$Assigned.Department)))
+maintopics = c("All", as.character(unique(sm_full$TopicBig)))
+topics = c("All", as.character(unique(sm_full$Topic)))
+depts = c("All", as.character(unique(sm_full$Assigned.Department)))
 
 
 ### header
-header = dashboardHeader(title="Santa Monica 311")
+header = dashboardHeader(title="Government Outreach")
 
 ### sidebar
 sidebar = dashboardSidebar(
@@ -25,7 +25,7 @@ sidebar = dashboardSidebar(
 
 ### Body
 body = dashboardBody(
-  tags$head(tags$style(HTML(".small-box {height: 160px}"))),
+  tags$head(tags$style(HTML(".smAll-box {height: 160px}"))),
   tags$style(type='text/css', '#ten {background-color: rgba(255,255,0,0.40); color: green;}'), 
   fluidRow(
     column(width=3,
@@ -46,7 +46,7 @@ body = dashboardBody(
   )
 )
 
-## overall layout
+## overAll layout
 dashboardPage(
   header,
   sidebar,
