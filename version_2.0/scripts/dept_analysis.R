@@ -36,12 +36,12 @@ dept_analysis = function(maintopic, start_date, end_date){
 #           legend.key = element_rect(fill = alpha("white", 0.0)))
 # }
   p <- plot_ly(d, x=~Assigned.Department, y=~`Number of Records`, type='bar', name='Number of Records') %>%
-    add_trace(y=~`Average Respond Time`, name = "Average Respond Hours") %>%
+    add_trace(y=~round(`Average Respond Time`,2), name = "Average Respond Hours") %>%
     layout(title = paste0(maintopic, " Topics Assigned Department Analysis"),
            titlefont = list(size=15),
            xaxis = list(title = '', tickangle = -25, tickfont=list(size=8)),
            yaxis = list(title = '', tickfont=list(size=10)),
-           legend = list(x = 0.7, y = 1, font=list(size=6)),
+           legend = list(x = 0.7, y = 1.05, font=list(size=6)),
            barmode = 'group')
   p
 }
