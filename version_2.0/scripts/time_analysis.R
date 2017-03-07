@@ -1,30 +1,13 @@
-time_analysis = function(maintopic, subtopic, dept, start_date, end_date){
+time_analysis = function(full_data){
   
-  d = sm_full %>% filter(!is.na(Days.to.Respond))
-  if (maintopic == 'all' & subtopic == 'all' & dept == 'all') {
-    d = sm_full %>% filter(Request.Date>start_date & Request.Date<end_date)
-  } else if (maintopic == 'all' & subtopic == 'all') {
-    d = sm_full %>% filter(Assigned.Department==dept & Request.Date>start_date & Request.Date<end_date)
-  } else if (maintopic == 'all' & dept == 'all') {
-    d = sm_full %>% filter(Topic==subtopic & Request.Date>start_date & Request.Date<end_date)
-  } else if (subtopic == 'all' & dept == 'all') {
-    d = sm_full %>% filter(TopicBig==maintopic & Request.Date>start_date & Request.Date<end_date)
-  } else if (maintopic == 'all') {
-    d = sm_full %>% filter(Topic==subtopic & Assigned.Department==dept & Request.Date>start_date & Request.Date<end_date)
-  } else if (subtopic == 'all') {
-    d = sm_full %>% filter(TopicBig==maintopic & Assigned.Department==dept & Request.Date>start_date & Request.Date<end_date)
-  } else if (dept == 'all') {
-    d = sm_full %>% filter(TopicBig==maintopic & Topic==subtopic & Request.Date>start_date & Request.Date<end_date)
-  } else {
-    d = sm_full %>% filter(TopicBig==maintopic & Topic==subtopic & Assigned.Department==dept & Request.Date>start_date & Request.Date<end_date)
-  }
+  d = full_data %>% filter(!is.na(Days.to.Respond))
   
   d$request_md = as.factor(paste(year(d$Request.Date),
                                  ifelse(month(d$Request.Date)<10,paste(0,month(d$Request.Date),sep=''),month(d$Request.Date)),sep='-'))
   d = d %>%
     dplyr::select(request_md, Days.to.Respond) %>%
     group_by(request_md) %>%
-    summarise("Number of Records" = n(), "Average Respond Time" = 24*sum(Days.to.Respond)/n())
+    summarise("Number of Records" = n(), "Average Respond Time" = ifelse(n()!=0,sum(24*Days.to.Respond)/n(),0))
   
   # dm = melt(d,id='request_md')
   # 
@@ -41,13 +24,14 @@ time_analysis = function(maintopic, subtopic, dept, start_date, end_date){
   #         legend.text = element_text(size=8),
   #         legend.position = c(0.85, 1),
   #         legend.key = element_rect(fill = alpha("white", 0.0)))
+  
   p = plot_ly(d,x=~request_md, y=~`Number of Records`, name="Number of Records", type='scatter', mode='lines+markers') %>%
-    add_trace(y=~`Average Respond Time`, name="Average Respond Time", mode='lines+markers') %>%
+    add_trace(y=~round(`Average Respond Time`, 2), name="Average Respond Time", mode='lines+markers') %>%
     layout(title = "Time Series Analysis",
            titlefont = list(size=15),
-           xaxis = list(title = '', tickangle = -60, tickfont=list(size=6)),
-           yaxis = list(title = '', tickfont=list(size=8)),
-           legend = list(x = 0.7, y = 1.2, font=list(size=6)))
+           xaxis = list(title = '', tickangle = -60, tickfont=list(size=8)),
+           yaxis = list(title = '', tickfont=list(size=10)),
+           legend = list(x = 0.69, y = 1.25, font=list(size=6)))
   
   p
 }
