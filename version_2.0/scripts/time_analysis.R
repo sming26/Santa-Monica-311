@@ -26,7 +26,7 @@ time_analysis = function(full_data){
   #         legend.key = element_rect(fill = alpha("white", 0.0)))
   
   p = plot_ly(d,x=~request_md, y=~`Number of Records`, name="Number of Records", type='scatter', mode='lines+markers') %>%
-    add_trace(y=~round(`Average Respond Time`, 2), name="Average Respond Time", mode='lines+markers') %>%
+    add_trace(y=~round(`Average Respond Time`, 2), name="Average Respond Hours", mode='lines+markers') %>%
     layout(title = "Time Series Analysis",
            titlefont = list(size=15),
            xaxis = list(title = '', tickangle = -60, tickfont=list(size=8)),
