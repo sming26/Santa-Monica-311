@@ -1,9 +1,13 @@
 time_analysis = function(full_data){
   
+  ## remove data without Days.to.Respond
   d = full_data %>% filter(!is.na(Days.to.Respond))
   
+  ## create time stamp as '2010-01'
   d$request_md = as.factor(paste(year(d$Request.Date),
                                  ifelse(month(d$Request.Date)<10,paste(0,month(d$Request.Date),sep=''),month(d$Request.Date)),sep='-'))
+  
+  ## create two metrics
   d = d %>%
     dplyr::select(request_md, Days.to.Respond) %>%
     group_by(request_md) %>%

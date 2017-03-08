@@ -1,18 +1,21 @@
 dept_analysis = function(maintopic, start_date, end_date){
   
+  ## set the data for department analysis
   if (maintopic == 'All'){
     d = sm_full %>% filter(Request.Date>start_date & Request.Date<end_date)
   } else {
     d = sm_full %>% filter(TopicBig %in% maintopic & TopicBig %in% maintopic & Request.Date>start_date & Request.Date<end_date)
   }
 
+  ## create the two metrics
   d = d %>%
     dplyr::select(Assigned.Department,Days.to.Respond) %>%
     group_by(Assigned.Department) %>%
     summarise("Number of Records" = n(), "Average Respond Time" = ifelse(n()!=0,24*sum(Days.to.Respond)/n(),0))
   
+  ## order the x axis to decreasing order of count
   x_order = order(d$`Number of Records`,decreasing = T)
-  d = d[c(x_order,length(x_order)+x_order),]
+  d = d[x_order,]
   d$Assigned.Department = as.character(d$Assigned.Department)
   d$Assigned.Department = factor(d$Assigned.Department, levels=unique(d$Assigned.Department))
   # dm = melt(d,id='Assigned.Department')

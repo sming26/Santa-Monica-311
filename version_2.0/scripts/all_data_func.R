@@ -27,6 +27,7 @@ sm<- sm[,c("Request.ID","Topic","Assigned.Department","Request.Date",
              "Response.Date","Days.to.Respond","Latitude","Longitude")]
 sm$Topic = as.character(sm$Topic)
 topic_new$TopicSm = as.character(topic_new$TopicSm)
+# Join main topics to original data
 sm_full = left_join(sm,topic_new,by=c("Topic"="TopicSm"))
 sm_full$TopicBig = ifelse(is.na(sm_full$TopicBig),'Others',sm_full$TopicBig)
 
