@@ -25,8 +25,7 @@ sidebar = dashboardSidebar(
 
 ### Body
 body = dashboardBody(
-  tags$head(tags$style(HTML(".small-box {height: 160px}"))),
-  tags$style(type='text/css', '#ten {background-color: rgba(255,255,0,0.40); color: green;}'), 
+  tags$style(HTML(".small-box {height: 160px}")), 
   fluidRow(
     column(width=3,
            valueBoxOutput("numberOfRequest", width=NULL)),

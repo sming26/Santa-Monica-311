@@ -6,14 +6,17 @@ library(dplyr)
 library(reshape2)
 library(lubridate)
 
+## set all maintopics and topics values
 maintopics = as.character(unique(sm_full$TopicBig))
 topics = as.character(unique(sm_full$Topic))
 
+## set topics drop-down menu contents
 subtopic_lst = list()
 for (i in seq(44)) {
   subtopic_lst[[i]] = as.character(unique(sm_full$Topic[sm_full$TopicBig==maintopics[i]]))
 }
 
+## store data with locations
 sm1 = sm_full[!(is.na(sm_full$Latitude) | is.na(sm_full$Longitude)),]
 
 server <- function(input, output, session) {
@@ -36,7 +39,7 @@ server <- function(input, output, session) {
       # addWebGLHeatmap(lng=~Longitude,lat=~Latitude,size=20,units='px',alphaRange=0.2)
   })
   
-  ## A reactive syncornizing of zooming both two maps 
+  ## A reactive syncornization of two maps 
   observe({
     new_center = input$heatmap_center
     new_zoom = input$heatmap_zoom
@@ -51,34 +54,29 @@ server <- function(input, output, session) {
   })
   
   ## A reactive expression that returns the set of requests that are in bounds right now
-  requestsInBounds <- reactive({
-    if (is.null(input$heatmap_bounds))
-      return(sm1[FALSE,])
-    bounds <- input$heatmap_bounds
-    latRng <- range(bounds$north, bounds$south)
-    lngRng <- range(bounds$east, bounds$west)
-
-    subset(sm1,
-           Latitude >= latRng[1] & Latitude <= latRng[2] &
-             Longitude >= lngRng[1] & Longitude <= lngRng[2])
-  })
+  # requestsInBounds <- reactive({
+  #   if (is.null(input$heatmap_bounds))
+  #     return(sm1[FALSE,])
+  #   bounds <- input$heatmap_bounds
+  #   latRng <- range(bounds$north, bounds$south)
+  #   lngRng <- range(bounds$east, bounds$west)
+  # 
+  #   subset(sm1,
+  #          Latitude >= latRng[1] & Latitude <= latRng[2] &
+  #            Longitude >= lngRng[1] & Longitude <= lngRng[2])
+  # })
   
   #### reset All the circles and auxiliary plots
   observeEvent(input$reset, {
-    # leafletProxy('circlemap') %>% clearGroup('circles')
-    # leafletProxy('heatmap') %>% clearGroup('heat')
     updateSelectInput(session, 'maintopic', selected = 'All')
     updateSelectInput(session, 'subtopic', selected = 'All')
     updateSelectInput(session, 'dept', selected = 'All')
     updateDateRangeInput(session, 'dateRange', start = Sys.Date()-365, end = Sys.Date())
-    # output$dept_analysis = renderPlot({})
-    # output$time_analysis = renderPlot({})
-    # more plots
   }) 
 
-  #### draw the circles and auxiliary plots
+  #### draw the two maps, two charts and summaries
   observe({
-    ## select the circle data
+    ## set the data for maps, charts and summaries
     # if (length(input$maintopic)==0 || length(input$dept)==0) {
     #   leafletProxy('circlemap') %>% clearGroup('circles')
     #   leafletProxy('heatmap') %>% clearGroup('heat')
@@ -150,10 +148,10 @@ server <- function(input, output, session) {
     pal <- colorFactor(palette = palette(rainbow(24)),
                        domain=maintopics)
 
-      ## radius are set by response time for the data point divided by max rsponse time multiply 100
-      # max_size <- max(circle_data$Days.to.Respond)
+    ## radius are set by response time for the data point divided by max rsponse time multiply 100
+    # max_size <- max(circle_data$Days.to.Respond)
 
-      ## set layerId as request ID to ensure All circles shown on the map
+    ## add the circles
     leafletProxy("circlemap", data = circle_data) %>%
       clearGroup('circles') %>%
       addCircles(~Longitude, ~Latitude, radius=20, layerId=~Request.ID,
@@ -165,7 +163,7 @@ server <- function(input, output, session) {
       clearGroup('heat') %>%
       addWebGLHeatmap(lng=~Longitude,lat=~Latitude,size=20,units='px',intensity=0.05,alphaRange=0.2,group='heat')
 
-    ## auxiliary plots
+    ## auxiliary charts and summaries
     output$dept_analysis <- renderPlotly({
       # If no requests are in view, don't plot
       # if (nrow(requestsInBounds()) == 0)
@@ -180,7 +178,6 @@ server <- function(input, output, session) {
       time_analysis(full_data)
     })
 
-    ##########-----------------add 3 final results to "paste0"-----------------------------#
     output$numberOfRequest <- renderValueBox({
       valueBox(
         summaries(full_data, input$dates[1], input$dates[2], input$dept)[[1]], 
